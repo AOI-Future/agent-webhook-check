@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>webhook-check — free AI-agent webhook signature auditor</title>
+<style>
+  :root { --ink:#141414; --mut:#5b5b5b; --line:#e3e3e3; --accent:#0b5; --bg:#fafafa; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  .wrap { max-width:680px; margin:0 auto; padding:48px 20px 80px; }
+  h1 { font-size:30px; line-height:1.2; margin:0 0 8px; letter-spacing:-.01em; }
+  .sub { color:var(--mut); font-size:18px; margin:0 0 32px; }
+  h2 { font-size:20px; margin:40px 0 12px; }
+  code, pre { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  pre { background:#0f1115; color:#e6e6e6; padding:16px; border-radius:8px; overflow:auto; font-size:13px; }
+  code { background:#eee; padding:1px 5px; border-radius:4px; font-size:13px; }
+  pre code { background:none; padding:0; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; margin:24px 0; }
+  ul { padding-left:20px; }
+  li { margin:6px 0; }
+  .muted { color:var(--mut); font-size:14px; }
+  a { color:#06c; }
+  .form-slot { border:1px dashed var(--line); border-radius:10px; padding:20px; background:#fff; }
+  label { display:block; font-weight:600; margin-bottom:6px; }
+  input[type=email] { width:100%; padding:12px 14px; font-size:16px; border:1px solid #ccc; border-radius:8px; }
+  button { margin-top:12px; width:100%; padding:12px 16px; font-size:16px; font-weight:600;
+           color:#fff; background:var(--accent); border:0; border-radius:8px; cursor:pointer; }
+  .integration-note { border-left:3px solid #f0a; background:#fff5fb; padding:10px 14px; margin:12px 0;
+                      font-size:13px; color:#803; border-radius:0 6px 6px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Your agent's webhook accepts a forged signature. Find out in one command.</h1>
+  <p class="sub">A free, single-file auditor for the highest-frequency real bug in AI-agent tool callbacks. No dependencies, no network, stdlib only.</p>
+
+  <div class="card">
+    <p>A webhook is the callback that lets an outside system trigger an agent action — a refund, a deploy, a fund movement. If the signature check can be fooled, an attacker drives your agent's hands. <code>webhook-check</code> runs four executable checks against your verifier and prints <strong>PASS/FAIL</strong>:</p>
+    <ul>
+      <li><strong>VT-D-050 / 051</strong> — accepts a valid signature, rejects a tampered body</li>
+      <li><strong>VT-D-052</strong> — length-safe: a forged short signature must not crash the handler (DoS)</li>
+      <li><strong>VT-D-053</strong> — constant-time comparison: no timing side channel that leaks the HMAC</li>
+    </ul>
+<pre><code>python3 webhook_check.py --demo                       # see it find a real bug
+python3 webhook_check.py --verifier yourmodule:verify # audit your own</code></pre>
+  </div>
+
+  <h2>Get the tool + the next free case</h2>
+  <p>Drop your email and I'll send the download link, plus the next free case and a heads-up when the standards (MCP, EMA) move.</p>
+
+  <!-- ============================================================= -->
+  <!-- EMAIL PROVIDER EMBED SLOT                                      -->
+  <!-- Replace the <form> below with your provider's embed snippet.   -->
+  <!-- (e.g. Kit/ConvertKit, MailerLite, Buttondown, Substack,        -->
+  <!--  Beehiiv). Paste their form HTML/script HERE, verbatim.        -->
+  <!-- The fallback form posts to FORM_ACTION_URL — set it to your    -->
+  <!-- provider's form-action endpoint if you keep this plain form.   -->
+  <!-- ============================================================= -->
+  <div class="form-slot">
+    <p class="integration-note">Integration point — swap this block for your email provider's embed, or set <code>FORM_ACTION_URL</code> below.</p>
+    <form action="FORM_ACTION_URL" method="post">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required placeholder="you@company.com" autocomplete="email">
+      <button type="submit">Send me the tool</button>
+      <p class="muted" style="margin-top:10px;">No spam. One email per real update. Unsubscribe any time.</p>
+    </form>
+  </div>
+
+  <h2>Want the whole surface, and evidence you can defend?</h2>
+  <div class="card">
+    <p>This free tool covers one case and tells you PASS or FAIL. The full <strong>AI-Agent Security Verification Kit</strong>:</p>
+    <ul>
+      <li>Covers identity, tools, untrusted content, the MCP supply chain, and EMA — one command against your config.</li>
+      <li>Seals each run into a single artifact — JSON + PDF — whose hash is countersigned by an <strong>RFC 3161</strong> timestamp authority. Proof of <em>what</em> you tested and <em>when</em>. <strong>No secret leaves your machine</strong> — only a hash and a nonce.</li>
+    </ul>
+    <p class="muted">
+      Book (free / pay-what-you-want): <a href="BOOK_URL">BOOK_URL</a> &nbsp;·&nbsp;
+      Verification kit: <a href="KIT_URL">KIT_URL</a>
+    </p>
+  </div>
+
+  <p class="muted">webhook-check is MIT-licensed. Run it, read it, share it.</p>
+
+</div>
+</body>
+</html>
