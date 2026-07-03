@@ -53,7 +53,7 @@ import sys
 # --- Where to go next (the funnel) ------------------------------------------
 # Overridable by environment so the tool can be re-pointed without editing
 # source. Defaults are placeholders until the real pages exist.
-BOOK_URL = os.environ.get("AGENTKIT_BOOK_URL", "<free book (1F): TBD>")
+BOOK_URL = os.environ.get("AGENTKIT_BOOK_URL", "https://leanpub.com/agent-security")
 KIT_URL = os.environ.get("AGENTKIT_KIT_URL", "<verification kit (2F): TBD>")
 LIST_URL = os.environ.get("AGENTKIT_LIST_URL", "https://dispatch.aoifuture.com/")
 
