@@ -52,21 +52,19 @@ python3 webhook_check.py --verifier yourmodule:verify # audit your own</code></p
   <p>Drop your email and I'll send the download link, plus the next free case and a heads-up when the standards (MCP, EMA) move.</p>
 
   <!-- ============================================================= -->
-  <!-- EMAIL PROVIDER EMBED SLOT                                      -->
-  <!-- Replace the <form> below with your provider's embed snippet.   -->
-  <!-- (e.g. Kit/ConvertKit, MailerLite, Buttondown, Substack,        -->
-  <!--  Beehiiv). Paste their form HTML/script HERE, verbatim.        -->
-  <!-- The fallback form posts to FORM_ACTION_URL — set it to your    -->
-  <!-- provider's form-action endpoint if you keep this plain form.   -->
+  <!-- EMAIL CAPTURE — Substack embed (dispatch.aoifuture.com)        -->
+  <!-- This is the live subscribe widget. To point at a different    -->
+  <!-- Substack publication, change the iframe src to                 -->
+  <!-- https://<publication>/embed . For a non-Substack provider,     -->
+  <!-- replace the whole iframe with that provider's embed snippet.   -->
   <!-- ============================================================= -->
   <div class="form-slot">
-    <p class="integration-note">Integration point — swap this block for your email provider's embed, or set <code>FORM_ACTION_URL</code> below.</p>
-    <form action="FORM_ACTION_URL" method="post">
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required placeholder="you@company.com" autocomplete="email">
-      <button type="submit">Send me the tool</button>
-      <p class="muted" style="margin-top:10px;">No spam. One email per real update. Unsubscribe any time.</p>
-    </form>
+    <iframe src="https://dispatch.aoifuture.com/embed"
+            title="Subscribe to the dispatch"
+            width="100%" height="320"
+            style="border:1px solid var(--line); border-radius:8px; background:#fff;"
+            frameborder="0" scrolling="no"></iframe>
+    <p class="muted" style="margin-top:10px;">Powered by Substack — <a href="https://dispatch.aoifuture.com/">dispatch.aoifuture.com</a>. No spam; unsubscribe any time.</p>
   </div>
 
   <h2>Want the whole surface, and evidence you can defend?</h2>

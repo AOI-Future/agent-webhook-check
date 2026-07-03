@@ -63,7 +63,7 @@ This free tool tells you **PASS or FAIL** for one case. The full **AI-Agent Secu
 
 - **The book (free / pay-what-you-want)** — what to verify across the agent attack surface and why: _`<free book (1F): TBD>`_
 - **The verification kit** — every check plus the timestamped evidence artifact: _`<verification kit (2F): TBD>`_
-- **Get the next free case** and an update when the standards move: _`<join the list: TBD>`_
+- **Get the next free case** and an update when the standards move: <https://dispatch.aoifuture.com/>
 
 The three URLs the CLI prints can also be set from the environment (`AGENTKIT_BOOK_URL`, `AGENTKIT_KIT_URL`, `AGENTKIT_LIST_URL`) without editing source.
 

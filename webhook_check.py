@@ -55,7 +55,7 @@ import sys
 # source. Defaults are placeholders until the real pages exist.
 BOOK_URL = os.environ.get("AGENTKIT_BOOK_URL", "<free book (1F): TBD>")
 KIT_URL = os.environ.get("AGENTKIT_KIT_URL", "<verification kit (2F): TBD>")
-LIST_URL = os.environ.get("AGENTKIT_LIST_URL", "<join the list: TBD>")
+LIST_URL = os.environ.get("AGENTKIT_LIST_URL", "https://dispatch.aoifuture.com/")
 
 
 # --- The signature primitive and reference verifiers ------------------------
