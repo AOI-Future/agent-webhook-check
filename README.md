@@ -61,9 +61,9 @@ This free tool tells you **PASS or FAIL** for one case. The full **AI-Agent Secu
 
 > Explanation and a single check are free. Execution across the whole surface, and the signed proof, are the kit.
 
-- **The book (free / pay-what-you-want)** — what to verify across the agent attack surface and why. _Publishing soon_ — [join the list](https://dispatch.aoifuture.com/) to get the link.
-- **The verification kit** — every check plus the timestamped evidence artifact. _Coming soon_ — [join the list](https://dispatch.aoifuture.com/) for launch.
-- **Get the next free case** and an update when the standards move: <https://dispatch.aoifuture.com/>
+- **The book — _AI Agent Security_ (free with a Leanpub membership / name your price)** — what to verify across the agent attack surface and why. **Live now** — <https://leanpub.com/agent-security>.
+- **The verification kit** — every check plus the timestamped evidence artifact. **Available now** — <https://0xshugo.gumroad.com/l/wbvgfb>.
+- **Get the next free case** and a heads-up when the standards move — [join the Security list](https://dispatch.aoifuture.com/s/security).
 
 The three URLs the CLI prints can also be set from the environment (`AGENTKIT_BOOK_URL`, `AGENTKIT_KIT_URL`, `AGENTKIT_LIST_URL`) without editing source.
 
