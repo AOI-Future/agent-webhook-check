@@ -51,7 +51,7 @@ into CI.
 - **The AI-Agent Security Verification Kit** — every check in one command,
   sealed into a single JSON + PDF artifact whose hash is countersigned by an
   RFC 3161 timestamp authority. Proof of *what* you tested and *when*; no secret
-  ever leaves your machine. https://0xshugo.gumroad.com/l/wbvgfb
+  ever leaves your machine. https://0xshugo.gumroad.com/l/AI-Agent
 
 Explanation is free. Execution across the whole surface, and the signed proof,
 are the kit.
@@ -99,5 +99,5 @@ are the kit.
 |------|-----|--------|
 | Tool (lead magnet) | github.com/AOI-Future/agent-webhook-check | PUBLIC |
 | Book (1F, free/$9) | leanpub.com/agent-security | live, 100% |
-| Kit (2F, $129/$399) | 0xshugo.gumroad.com/l/wbvgfb | published |
+| Kit (2F, $129/$399) | 0xshugo.gumroad.com/l/AI-Agent | published |
 | List (capture) | dispatch.aoifuture.com | live (Substack) |
