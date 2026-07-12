@@ -53,6 +53,13 @@ def test_cli_exit_codes():
     assert wc.main(["--verifier", "examples.vulnerable_verifier:verify", "--no-cta"]) == 1
 
 
+def test_default_funnel_urls_are_live_not_placeholders():
+    assert wc.BOOK_URL == "https://leanpub.com/agent-security"
+    assert wc.KIT_URL == "https://0xshugo.gumroad.com/l/AI-Agent"
+    assert wc.LIST_URL == "https://dispatch.aoifuture.com/s/security"
+    assert "TBD" not in wc.KIT_URL
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
