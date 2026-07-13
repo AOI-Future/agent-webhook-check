@@ -51,7 +51,7 @@ into CI.
 - **The AI-Agent Security Verification Kit** — every check in one command,
   sealed into a single JSON + PDF artifact whose hash is countersigned by an
   RFC 3161 timestamp authority. Proof of *what* you tested and *when*; no secret
-  ever leaves your machine. https://0xshugo.gumroad.com/l/AI-Agent
+  ever leaves your machine. https://0xshugo.gumroad.com/l/AI-Agent?utm_source=github&utm_medium=tool&utm_campaign=agent_security_funnel&utm_content=welcome_email
 
 Explanation is free. Execution across the whole surface, and the signed proof,
 are the kit.

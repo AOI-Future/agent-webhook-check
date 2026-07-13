@@ -55,7 +55,10 @@ def test_cli_exit_codes():
 
 def test_default_funnel_urls_are_live_not_placeholders():
     assert wc.BOOK_URL == "https://leanpub.com/agent-security"
-    assert wc.KIT_URL == "https://0xshugo.gumroad.com/l/AI-Agent"
+    assert wc.KIT_URL == (
+        "https://0xshugo.gumroad.com/l/AI-Agent?utm_source=github&utm_medium=tool"
+        "&utm_campaign=agent_security_funnel&utm_content=cli_output"
+    )
     assert wc.LIST_URL == "https://dispatch.aoifuture.com/s/security"
     assert "TBD" not in wc.KIT_URL
 

@@ -54,7 +54,10 @@ import sys
 # Overridable by environment so the tool can be re-pointed without editing
 # source. Defaults point to the live product funnel.
 BOOK_URL = os.environ.get("AGENTKIT_BOOK_URL", "https://leanpub.com/agent-security")
-KIT_URL = os.environ.get("AGENTKIT_KIT_URL", "https://0xshugo.gumroad.com/l/AI-Agent")
+KIT_URL = os.environ.get(
+    "AGENTKIT_KIT_URL",
+    "https://0xshugo.gumroad.com/l/AI-Agent?utm_source=github&utm_medium=tool&utm_campaign=agent_security_funnel&utm_content=cli_output",
+)
 LIST_URL = os.environ.get("AGENTKIT_LIST_URL", "https://dispatch.aoifuture.com/s/security")
 
 
