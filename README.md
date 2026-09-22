@@ -30,14 +30,39 @@ def verify(secret: bytes, body: bytes, header: str) -> bool:
     Must NOT raise on malformed input; must return False."""
 ```
 
-Exit code is `0` if every check passes, `1` if any fails — so you can drop it into CI.
-
 Try it against the worked examples in `examples/`:
 
 ```bash
 python3 webhook_check.py --verifier examples.vulnerable_verifier:verify   # fails
 python3 webhook_check.py --verifier examples.fixed_verifier:verify        # passes
 ```
+
+### Exit codes (CI)
+
+Use **`--verifier`** in CI. **`--demo`** and the no-argument default are educational: they print PASS/FAIL for the built-in references but **always exit `0`**, even when the vulnerable reference block shows FAIL lines.
+
+| Code | When |
+|------|------|
+| `0` | With `--verifier`: every check is PASS or SKIP (no FAIL). Demo / no-args: always. |
+| `1` | With `--verifier`: at least one check is FAIL. |
+| `2` | With `--verifier`: could not resolve `module:function` (import or attribute error). |
+
+SKIP (for example VT-D-053 when verifier source is not inspectable) does **not** fail the run.
+
+```bash
+# CI gate — non-zero only on verifier FAIL or resolve error
+python3 webhook_check.py --verifier yourmodule:verify --no-cta
+```
+
+There is no `pyproject.toml` or `requirements.txt`: **stdlib only**. Run from the repo root so `examples.*` resolves, or set `PYTHONPATH` to the directory that contains your module.
+
+### Development / tests
+
+```bash
+python3 tests/test_webhook_check.py
+```
+
+The test module uses only the standard library (no pytest required). Run it from the repository root.
 
 ## What it checks
 
