@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>webhook-check — free AI-agent webhook signature auditor</title>
 <style>
-  :root { --ink:#141414; --mut:#5b5b5b; --line:#e3e3e3; --accent:#0b5; --bg:#fafafa; }
+  :root { --ink:#141414; --mut:#5b5b5b; --line:#e3e3e3; --bg:#fafafa; }
   * { box-sizing: border-box; }
   body { margin:0; font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
          color:var(--ink); background:var(--bg); }
@@ -23,12 +23,6 @@
   .muted { color:var(--mut); font-size:14px; }
   a { color:#06c; }
   .form-slot { border:1px dashed var(--line); border-radius:10px; padding:20px; background:#fff; }
-  label { display:block; font-weight:600; margin-bottom:6px; }
-  input[type=email] { width:100%; padding:12px 14px; font-size:16px; border:1px solid #ccc; border-radius:8px; }
-  button { margin-top:12px; width:100%; padding:12px 16px; font-size:16px; font-weight:600;
-           color:#fff; background:var(--accent); border:0; border-radius:8px; cursor:pointer; }
-  .integration-note { border-left:3px solid #f0a; background:#fff5fb; padding:10px 14px; margin:12px 0;
-                      font-size:13px; color:#803; border-radius:0 6px 6px 0; }
 </style>
 </head>
 <body>
@@ -49,19 +43,9 @@ python3 webhook_check.py --verifier yourmodule:verify # audit your own</code></p
   </div>
 
   <h2>Get the tool + the next free case</h2>
-  <p>Drop your email and I'll send the download link, plus the next free case and a heads-up when the standards (MCP, EMA) move.</p>
+  <p>The tool is already public — <a href="https://github.com/AOI-Future/agent-webhook-check">grab it on GitHub</a> anytime. Drop your email for the welcome message with the link again, the next free case, and a heads-up when the standards (MCP, EMA) move.</p>
 
-  <!-- ============================================================= -->
-  <!-- EMAIL CAPTURE — Substack embed (dispatch.aoifuture.com)        -->
-  <!-- This is the live subscribe widget. Security posts live in the  -->
-  <!-- publication's "Security" section (web URL:                     -->
-  <!-- https://dispatch.aoifuture.com/s/security ). The welcome email  -->
-  <!-- is global, so every subscriber captured here gets the tool     -->
-  <!-- link and the security thread — regardless of section. To point -->
-  <!-- at a different Substack publication, change the iframe src to   -->
-  <!-- https://<publication>/embed . For a non-Substack provider,     -->
-  <!-- replace the whole iframe with that provider's embed snippet.   -->
-  <!-- ============================================================= -->
+  <!-- Substack embed (dispatch.aoifuture.com) — see funnel/welcome-email.md -->
   <div class="form-slot">
     <iframe src="https://dispatch.aoifuture.com/embed"
             title="Subscribe to the dispatch"
