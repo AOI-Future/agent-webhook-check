@@ -32,6 +32,9 @@ Usage
     # Audit your own verifier in place:
     python3 webhook_check.py --verifier yourmodule:verify
 
+    # Machine-readable output: one JSON object on stdout, nothing else:
+    python3 webhook_check.py --demo --json
+
 A verifier is any callable ``verify(secret: bytes, body: bytes, header: str)
 -> bool`` that returns True iff ``header`` is a valid signature of ``body``
 under ``secret``. It MUST NOT raise on malformed input; it MUST return False.
@@ -47,6 +50,7 @@ import hashlib
 import hmac
 import importlib
 import inspect
+import json
 import os
 import sys
 
@@ -279,6 +283,10 @@ def main(argv: list[str] | None = None) -> int:
                    help="Run the built-in vulnerable and fixed references so you "
                         "can see the tool find a real bug with no setup.")
     p.add_argument("--no-cta", action="store_true", help=argparse.SUPPRESS)
+    p.add_argument("--json", action="store_true", dest="json",
+                   help="Print a single machine-readable JSON object to stdout "
+                        "and nothing else (no funnel, no decorative text). "
+                        "Exit codes are unchanged.")
     args = p.parse_args(argv)
 
     # A fixed, non-secret test key: not a credential, only so a valid signature
@@ -287,6 +295,9 @@ def main(argv: list[str] | None = None) -> int:
 
     blocks: list[str] = []
     exit_code = 0
+    rows: list[dict] = []
+    vuln_rows: list[dict] = []
+    fixed_rows: list[dict] = []
 
     if args.verifier:
         try:
@@ -296,20 +307,44 @@ def main(argv: list[str] | None = None) -> int:
                   f"{type(e).__name__}: {e}", file=sys.stderr)
             return 2
         rows = evaluate(probe(verify, test_secret))
-        blocks.append(render(rows, label=f"target = {args.verifier}"))
+        if not args.json:
+            blocks.append(render(rows, label=f"target = {args.verifier}"))
         if any(r["status"] == FAIL for r in rows):
             exit_code = 1
     else:
         # Default and --demo behave the same: show the contrast.
         vuln_rows = evaluate(probe(reference_vulnerable, test_secret))
         fixed_rows = evaluate(probe(reference_fixed, test_secret))
-        blocks.append(render(vuln_rows,
-                             label="built-in VULNERABLE reference (what a bug looks like)"))
-        blocks.append(render(fixed_rows,
-                             label="built-in FIXED reference (what correct looks like)"))
-        if not args.demo:
-            blocks.insert(0, "No --verifier given; showing the built-in demo. "
-                             "Point --verifier module:function at your own to audit it.\n")
+        if not args.json:
+            blocks.append(render(vuln_rows,
+                                 label="built-in VULNERABLE reference (what a bug looks like)"))
+            blocks.append(render(fixed_rows,
+                                 label="built-in FIXED reference (what correct looks like)"))
+            if not args.demo:
+                blocks.insert(0, "No --verifier given; showing the built-in demo. "
+                                 "Point --verifier module:function at your own to audit it.\n")
+        if any(r["status"] == FAIL for r in vuln_rows + fixed_rows):
+            exit_code = 1
+
+    if args.json:
+        # Pure machine-readable mode: exactly one JSON object on stdout,
+        # one line, no funnel, no decorative text, no prompts, no logs.
+        # Exit-code convention is unchanged: all rows PASS -> 0,
+        # any FAIL -> 1, verifier resolution failure -> 2 (returned above).
+        # In demo mode stdout carries a two-element array — one object per
+        # built-in reference: the vulnerable block followed by the fixed
+        # block (4 rows each).
+        if args.verifier:
+            payload: dict | list = {"verifier": args.verifier, "rows": rows}
+        else:
+            payload = [
+                {"verifier": "webhook_check:reference_vulnerable",
+                 "rows": vuln_rows},
+                {"verifier": "webhook_check:reference_fixed",
+                 "rows": fixed_rows},
+            ]
+        print(json.dumps(payload, ensure_ascii=False))
+        return exit_code
 
     print("\n\n".join(blocks))
     if not args.no_cta:

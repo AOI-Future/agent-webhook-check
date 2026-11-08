@@ -1,13 +1,21 @@
 """Smoke tests for the free webhook-check tool.
 
-Run: python3 -m pytest tests/ -q   (pytest optional; also runnable as a script)
+Run: python3 tests/test_webhook_check.py   (script-mode; pytest optional)
 """
 from __future__ import annotations
 
+import contextlib
+import io
+import json
+import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "webhook_check.py"
 
 import webhook_check as wc  # noqa: E402
 
@@ -51,6 +59,96 @@ def test_equality_verifier_is_length_safe_but_not_constant_time():
 def test_cli_exit_codes():
     assert wc.main(["--verifier", "examples.fixed_verifier:verify", "--no-cta"]) == 0
     assert wc.main(["--verifier", "examples.vulnerable_verifier:verify", "--no-cta"]) == 1
+
+
+def _run_cli(*extra: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(SCRIPT), *extra],
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+
+
+def _assert_pure_json_line(stdout: str) -> Any:
+    """stdout must be exactly one line of pure, parseable JSON.
+
+    Shape: verifier mode emits one {verifier, rows} object; demo mode emits
+    a two-element array of such objects (vulnerable block, then fixed).
+    """
+    lines = stdout.splitlines()
+    assert len(lines) == 1, f"expected exactly 1 stdout line, got {len(lines)}: {lines!r}"
+    payload = json.loads(lines[0])  # raises if not pure JSON
+    blocks = payload if isinstance(payload, list) else [payload]
+    for b in blocks:
+        assert isinstance(b, dict)
+        assert set(b.keys()) == {"verifier", "rows"}
+        assert isinstance(b["verifier"], str)
+        assert isinstance(b["rows"], list)
+        for r in b["rows"]:
+            assert set(r.keys()) == {"id", "title", "status", "detail"}
+            assert isinstance(r["id"], str) and isinstance(r["title"], str)
+            assert r["status"] in ("PASS", "FAIL", "SKIP")
+            assert isinstance(r["detail"], str)
+    return payload
+
+
+def test_json_demo_output_is_machine_readable():
+    # --demo --no-cta --json: one JSON line, no funnel/CTA/decoration.
+    # Demo shape: a two-element array — one block per built-in reference,
+    # vulnerable then fixed (r1 shape: one object per verifier).
+    proc = _run_cli("--demo", "--no-cta", "--json")
+    # Built-in vulnerable reference FAILs 052/053 -> exit code 1.
+    assert proc.returncode == 1, proc.stderr
+    payload = _assert_pure_json_line(proc.stdout)
+    assert isinstance(payload, list), f"demo must be a 2-element array: {payload!r}"
+    assert [b["verifier"] for b in payload] == [
+        "webhook_check:reference_vulnerable",
+        "webhook_check:reference_fixed",
+    ]
+    ids = ["VT-D-050", "VT-D-051", "VT-D-052", "VT-D-053"]
+    vuln, fixed = payload[0]["rows"], payload[1]["rows"]
+    assert [r["id"] for r in vuln] == ids
+    assert [r["id"] for r in fixed] == ids
+    assert all(r["status"] == "PASS" for r in fixed)
+    assert sum(1 for r in vuln if r["status"] == "FAIL") == 2
+    # No funnel / decorative text leaks into the JSON line.
+    assert "gumroad" not in proc.stdout and "leanpub" not in proc.stdout
+    assert "─" not in proc.stdout and "RESULT:" not in proc.stdout
+
+
+def test_json_fixed_verifier_output_all_pass_exit_zero():
+    # reference_fixed target: exit code 0, 4 rows, verifier echoes the spec.
+    spec = "examples.fixed_verifier:verify"
+    proc = _run_cli("--verifier", spec, "--json")
+    assert proc.returncode == 0, proc.stderr
+    payload = _assert_pure_json_line(proc.stdout)
+    assert payload["verifier"] == spec
+    assert len(payload["rows"]) == 4
+    assert all(r["status"] == "PASS" for r in payload["rows"])
+
+
+def test_json_vulnerable_verifier_exit_one():
+    spec = "examples.vulnerable_verifier:verify"
+    proc = _run_cli("--verifier", spec, "--json")
+    assert proc.returncode == 1, proc.stderr
+    payload = _assert_pure_json_line(proc.stdout)
+    assert payload["verifier"] == spec
+    assert len(payload["rows"]) == 4
+
+
+def test_json_unresolvable_verifier_exit_two_no_stdout():
+    proc = _run_cli("--verifier", "no.such.module:verify", "--json")
+    assert proc.returncode == 2
+    assert proc.stdout == ""
+
+
+def test_json_mode_in_process_prints_only_json():
+    buf_out, buf_err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(buf_out), contextlib.redirect_stderr(buf_err):
+        code = wc.main(["--demo", "--no-cta", "--json"])
+    assert code == 1
+    payload = _assert_pure_json_line(buf_out.getvalue())
+    assert isinstance(payload, list) and len(payload) == 2
+    assert buf_err.getvalue() == ""
 
 
 def test_default_funnel_urls_are_live_not_placeholders():
