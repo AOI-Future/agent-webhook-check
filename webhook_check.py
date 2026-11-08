@@ -35,6 +35,9 @@ Usage
     # Machine-readable output: one JSON object on stdout, nothing else:
     python3 webhook_check.py --demo --json
 
+    # Same machine-readable mode, but printed as indented multi-line JSON:
+    python3 webhook_check.py --demo --json-pretty
+
 A verifier is any callable ``verify(secret: bytes, body: bytes, header: str)
 -> bool`` that returns True iff ``header`` is a valid signature of ``body``
 under ``secret``. It MUST NOT raise on malformed input; it MUST return False.
@@ -287,7 +290,16 @@ def main(argv: list[str] | None = None) -> int:
                    help="Print a single machine-readable JSON object to stdout "
                         "and nothing else (no funnel, no decorative text). "
                         "Exit codes are unchanged.")
+    p.add_argument("--json-pretty", action="store_true", dest="json_pretty",
+                   help="Machine-readable mode like --json (JSON only on stdout, "
+                        "no funnel, no decorative text, exit codes unchanged), "
+                        "but the payload is printed as indented multi-line JSON "
+                        "(indent=2). The structure is identical to --json.")
     args = p.parse_args(argv)
+
+    # --json and --json-pretty are both machine-readable; --json-pretty only
+    # changes the formatting (indent=2), never the payload structure.
+    machine_readable = args.json or args.json_pretty
 
     # A fixed, non-secret test key: not a credential, only so a valid signature
     # can be computed for comparison. Deterministic so runs are reproducible.
@@ -307,7 +319,7 @@ def main(argv: list[str] | None = None) -> int:
                   f"{type(e).__name__}: {e}", file=sys.stderr)
             return 2
         rows = evaluate(probe(verify, test_secret))
-        if not args.json:
+        if not machine_readable:
             blocks.append(render(rows, label=f"target = {args.verifier}"))
         if any(r["status"] == FAIL for r in rows):
             exit_code = 1
@@ -315,7 +327,7 @@ def main(argv: list[str] | None = None) -> int:
         # Default and --demo behave the same: show the contrast.
         vuln_rows = evaluate(probe(reference_vulnerable, test_secret))
         fixed_rows = evaluate(probe(reference_fixed, test_secret))
-        if not args.json:
+        if not machine_readable:
             blocks.append(render(vuln_rows,
                                  label="built-in VULNERABLE reference (what a bug looks like)"))
             blocks.append(render(fixed_rows,
@@ -326,9 +338,11 @@ def main(argv: list[str] | None = None) -> int:
         if any(r["status"] == FAIL for r in vuln_rows + fixed_rows):
             exit_code = 1
 
-    if args.json:
-        # Pure machine-readable mode: exactly one JSON object on stdout,
-        # one line, no funnel, no decorative text, no prompts, no logs.
+    if machine_readable:
+        # Pure machine-readable mode: exactly one JSON document on stdout,
+        # no funnel, no decorative text, no prompts, no logs. --json prints
+        # it as one compact line; --json-pretty prints the identical payload
+        # as indented multi-line JSON (indent=2).
         # Exit-code convention is unchanged: all rows PASS -> 0,
         # any FAIL -> 1, verifier resolution failure -> 2 (returned above).
         # In demo mode stdout carries a two-element array — one object per
@@ -343,7 +357,11 @@ def main(argv: list[str] | None = None) -> int:
                 {"verifier": "webhook_check:reference_fixed",
                  "rows": fixed_rows},
             ]
-        print(json.dumps(payload, ensure_ascii=False))
+        if args.json_pretty:
+            # Indented multi-line rendering; structure identical to --json.
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(json.dumps(payload, ensure_ascii=False))
         return exit_code
 
     print("\n\n".join(blocks))

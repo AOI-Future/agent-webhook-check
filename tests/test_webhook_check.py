@@ -151,6 +151,93 @@ def test_json_mode_in_process_prints_only_json():
     assert buf_err.getvalue() == ""
 
 
+# --- --json-pretty -----------------------------------------------------------
+
+def test_json_pretty_demo_is_parseable_indented_multiline():
+    # (a) --demo --json-pretty: parseable JSON, multi-line, with indent=2
+    # indentation; no funnel/CTA leaking in.
+    proc = _run_cli("--demo", "--json-pretty")
+    assert proc.returncode == 1, proc.stderr
+    stdout = proc.stdout
+    payload = json.loads(stdout)  # raises if not pure JSON
+    assert isinstance(payload, list) and len(payload) == 2
+    lines = stdout.rstrip("\n").splitlines()
+    assert len(lines) > 1, "--json-pretty output must be multi-line"
+    # indent=2 evidence: nested openers and members sit on 2-space multiples.
+    assert lines[0] == "["
+    assert any(ln == "  {" for ln in lines), lines[:6]
+    assert any(ln.startswith('    "verifier": ') for ln in lines), lines[:8]
+    assert any(ln.startswith('        "id": "VT-D-050"') for ln in lines)
+    # Exact formatting contract: byte-identical to json.dumps(indent=2).
+    assert stdout.rstrip("\n") == json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def test_json_pretty_structure_identical_to_json():
+    # (b) parsed structure of --json-pretty equals --json in both modes.
+    demo_pretty = _run_cli("--demo", "--json-pretty")
+    demo_json = _run_cli("--demo", "--json")
+    assert demo_pretty.returncode == demo_json.returncode == 1
+    pretty_payload = json.loads(demo_pretty.stdout)
+    json_payload = json.loads(demo_json.stdout)
+    assert pretty_payload == json_payload
+    assert [b["verifier"] for b in pretty_payload] == [
+        "webhook_check:reference_vulnerable",
+        "webhook_check:reference_fixed",
+    ]
+
+    spec = "examples.fixed_verifier:verify"
+    pretty_v = _run_cli("--verifier", spec, "--json-pretty")
+    json_v = _run_cli("--verifier", spec, "--json")
+    assert pretty_v.returncode == json_v.returncode == 0
+    assert json.loads(pretty_v.stdout) == json.loads(json_v.stdout)
+
+
+def test_json_still_exactly_one_compact_line():
+    # (c) --json remains exactly one compact line for compatibility.
+    proc = _run_cli("--demo", "--json")
+    assert proc.returncode == 1, proc.stderr
+    _assert_pure_json_line(proc.stdout)
+    assert "\n" not in proc.stdout.rstrip("\n")
+
+    spec = "examples.fixed_verifier:verify"
+    proc = _run_cli("--verifier", spec, "--json")
+    assert proc.returncode == 0, proc.stderr
+    _assert_pure_json_line(proc.stdout)
+
+
+def test_json_pretty_suppresses_funnel_and_cta():
+    # (d) --json-pretty prints no funnel/CTA or decorative text on stdout
+    # (run WITHOUT --no-cta: machine-readable mode must suppress it itself).
+    proc = _run_cli("--demo", "--json-pretty")
+    stdout = proc.stdout
+    for needle in ("gumroad", "leanpub", "dispatch.aoifuture",
+                   "RESULT:", "webhook-check —", "─", "•"):
+        assert needle not in stdout, f"{needle!r} leaked into stdout"
+    # And it is still pure JSON end-to-end.
+    json.loads(stdout)
+
+
+def test_json_pretty_exit_codes_match_json():
+    # (e) exit-code convention unchanged vs --json: all PASS -> 0,
+    # any FAIL -> 1, verifier resolution failure -> 2 (stdout empty).
+    cases = [
+        ["--demo"],
+        ["--verifier", "examples.fixed_verifier:verify"],
+        ["--verifier", "examples.vulnerable_verifier:verify"],
+        ["--verifier", "no.such.module:verify"],
+    ]
+    for base in cases:
+        pretty = _run_cli(*base, "--json-pretty")
+        compact = _run_cli(*base, "--json")
+        assert pretty.returncode == compact.returncode, (base, pretty.returncode)
+    assert _run_cli("--demo", "--json-pretty").returncode == 1
+    assert _run_cli("--verifier", "examples.fixed_verifier:verify",
+                    "--json-pretty").returncode == 0
+    proc = _run_cli("--verifier", "no.such.module:verify", "--json-pretty")
+    assert proc.returncode == 2
+    assert proc.stdout == ""
+
+
 def test_default_funnel_urls_are_live_not_placeholders():
     assert wc.BOOK_URL == "https://leanpub.com/agent-security"
     assert wc.KIT_URL == (

@@ -2,6 +2,17 @@
 
 このプロジェクトの変更履歴。日付は W3C 形式、版番号は [Semantic Versioning](https://semver.org/lang/ja/) に従う。
 
+## [1.2.0] - 2026-11-08
+
+### Added
+- `--json-pretty` フラグ: `--json` と同一の機械可読モード（funnel・装飾テキストなし、終了コード規約不変）だが、ペイロードを `indent=2` の整形式複数行で印字する
+  - `--json` は互換性のため従来どおり compact 1行のまま不変
+  - demo（2要素配列）・verifier指定（単一オブジェクト）両モードで `--json` と解析結果が同値
+- `tests/test_webhook_check.py` に `--json-pretty` の整形式性・構造同値性・compact 互換・funnel 非表示・終了コード一致を検証するテスト 5 件を追加
+
+### Provenance
+本機能は agent-work-harness のコントラクト実行により得られた証拠付きマージ候補（contract `webhook-json-pretty-r3b`、base `896f301`、patch sha256 `7fddc8e2f546e30e6a79fb1c5c4a9676617dcc38ac6fbe5bda715a1faffaa2c8`、controller verify rc=0、独立レビュー PASS、外部副作用ゼロ）。
+
 ## [1.1.0] - 2026-11-08
 
 ### Added
